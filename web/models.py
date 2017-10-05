@@ -21,8 +21,7 @@ class Expense(models.Model):
     user = models.ForeignKey(User)
 
     def __unicode__(self):
-        # return self.text
-        return "{}-{}".format(self.date, self.amount)
+        return "{}-{}-{}".format(self.date,self.user, self.amount)
 
 
 class Income(models.Model):
@@ -30,3 +29,13 @@ class Income(models.Model):
     date = models.DateTimeField()
     amount = models.BigIntegerField()
     user = models.ForeignKey(User)
+    def __unicode__(self):
+        return "{}-{}-{}".format(self.date,self.user, self.amount)
+
+
+class Passwordresetcodes(models.Model):
+    code = models.CharField(max_length=32)
+    email = models.CharField(max_length=120)
+    time = models.DateTimeField()
+    username = models.CharField(max_length=50)
+    password = models.CharField(max_length=50)  # TODO: do not save password

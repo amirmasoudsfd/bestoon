@@ -42,16 +42,14 @@
                         <span class="icon-bar"></span>
                     </button>
 
-                    <a class="navbar-brand" href="{% url 'index' %}">			                
-                      بستون
-                    </a>
+
                 </div>
                 <!-- Collect the nav links, forms, and other content for toggling -->
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                   <ul class="nav navbar-nav navbar-left">
                     {% if user.is_authenticated %}
                     <!--<li><a href="/static/todoer_release.apk">اپ اندروید</a></li>-->
-                    <li><a href="{% url 'logout' %}">خروج</a></li>
+                    <li><a href="">خروج</a></li>
                     {% else %}
                     <li><a href="{% url 'register' %}">ثبت نام</a></li>
                     <!--<li><a href="/static/todoer_release.apk">اپ اندروید</a></li>-->
@@ -79,8 +77,8 @@
 
               <p>
                 <strong>بستون</strong> یک پروژهٔ آزاد و متن‌باز است.<br>
-			<a href="https://github.com/jadijadi/bestoon">مخرن گیت‌هاب پروژه</a> |
-			<a href="http://gapper.ir/channel/bestoon">گزارش مشکلات و پیشنهادها</a>
+			<a href="https://github.com/amirmasoudsfd/bestoon">مخرن گیت‌هاب پروژه</a> |
+			<a href="http://sefidian.com">گزارش مشکلات و پیشنهادها</a>
               </p>
             </div>
           </div>
