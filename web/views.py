@@ -7,9 +7,10 @@ from json import JSONEncoder
 
 from datetime import datetime
 
+from django.db.models import Sum, Count
+
 from web.models import *
 import requests
-
 
 from django.core import serializers
 from django.conf import settings
@@ -27,8 +28,9 @@ from .models import User, Token, Expense, Income, Passwordresetcodes
 random_str = lambda N: ''.join(
     random.SystemRandom().choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(N))
 
+
 def index(request):
-    context={}
+    context = {}
     return render(request, 'index.html', context)
 
 
@@ -53,6 +55,20 @@ def grecaptcha_verify(request):
     verify_rs = requests.get(url, params=params, verify=True)
     verify_rs = verify_rs.json()
     return verify_rs.get("success", False)
+
+@csrf_exempt
+def generalstat(request):
+    # TODO: get a duration (from - to), default 1 month
+
+    thisToken = request.POST['token']
+    thisUser = User.objects.filter(token__token=thisToken).get()
+
+    income = Income.objects.filter(user=thisUser).aggregate(Count('amount'), Sum('amount'))
+    expense = Expense.objects.filter(user=thisUser).aggregate(Count('amount'), Sum('amount'))
+
+    context = {'expense': expense, 'income': income}
+
+    return JsonResponse(context, encoder=JSONEncoder)
 
 
 def register(request):
