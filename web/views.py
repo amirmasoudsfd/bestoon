@@ -155,7 +155,7 @@ def submit_income(request):
     if 'date' in request.POST:
         date = request.POST['date']
     else:
-        date = datetime.datetime.now()
+        date = datetime.now()
 
     Income.objects.create(user=thisUser, amount=request.POST['amount'],
                           text=request.POST['text'], date=date)
@@ -176,7 +176,7 @@ def submit_expense(request):
     if 'date' in request.POST:
         date = request.POST['date']
     else:
-        date = datetime.datetime.now()
+        date = datetime.now()
 
     Expense.objects.create(user=thisUser, amount=request.POST['amount'],
                            text=request.POST['text'], date=date)
