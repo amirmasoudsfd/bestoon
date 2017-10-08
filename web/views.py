@@ -70,6 +70,9 @@ def generalstat(request):
 
     return JsonResponse(context, encoder=JSONEncoder)
 
+def login(request):
+    pass
+
 
 def register(request):
     if request.POST.has_key('requestcode'):
