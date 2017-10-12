@@ -7,6 +7,7 @@ from json import JSONEncoder
 
 from datetime import datetime
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Sum, Count
 
 from web.models import *
@@ -56,6 +57,7 @@ def grecaptcha_verify(request):
     verify_rs = verify_rs.json()
     return verify_rs.get("success", False)
 
+
 @csrf_exempt
 def generalstat(request):
     # TODO: get a duration (from - to), default 1 month
@@ -70,8 +72,26 @@ def generalstat(request):
 
     return JsonResponse(context, encoder=JSONEncoder)
 
+
+@csrf_exempt
 def login(request):
-    pass
+    if request.POST.has_key('username') and request.POST.has_key('password'):
+        username, password = request.POST['username'], request.POST['password']
+        try:
+            thisUser = User.objects.get(username=username)
+        except ObjectDoesNotExist:
+            context = {'result': 'error'}
+            return JsonResponse(context, encoder=JSONEncoder)
+
+
+        if check_password(password, thisUser.password):
+            thisToken = Token.objects.get(user=thisUser)
+            token = thisToken.token
+            context = {'result': 'ok', 'token': token}
+            return JsonResponse(context, encoder=JSONEncoder)
+        else:
+            context = {'result': 'error'}
+            return JsonResponse(context, encoder=JSONEncoder)
 
 
 def register(request):

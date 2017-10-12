@@ -8,6 +8,11 @@ POST, returns a json
  input: date (optional), text, amount, token
  output: status:ok
 
+/accounts/login/
+POST
+input : username, password
+output, status, token
+
 /accounts/register/
   step1:
     POST
