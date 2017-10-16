@@ -27,3 +27,15 @@ output, status, token
   POST, returns a json
   input: fromdate (optional), todate(optional), token
   output: json from some general stats related to this user
+
+
+/q/income/
+  POST, returns a json
+  input: token , count(optional)
+  output: last count incomes
+
+
+/q/expense/
+  POST, returns a json
+  input: token , count(optional)
+  output: last count incomes

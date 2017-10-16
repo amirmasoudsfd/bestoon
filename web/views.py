@@ -18,7 +18,7 @@ from django.conf import settings
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.hashers import make_password
 from django.db.models import Sum, Count
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django.views.decorators.csrf import csrf_exempt
@@ -27,7 +27,7 @@ from .models import User, Token, Expense, Income, Passwordresetcodes
 
 from django.views.decorators.http import require_POST
 
-from .utils import grecaptcha_verify, RateLimited,get_client_ip
+from .utils import grecaptcha_verify, RateLimited, get_client_ip
 
 # create random string for Toekn
 random_str = lambda N: ''.join(
@@ -39,6 +39,39 @@ def index(request):
     return render(request, 'index.html', context)
 
 
+@csrf_exempt
+def news(request):
+    news = News.objects.all().order_by('-date')[:11]
+    news_serialized = serializers.serialize("json", news)
+    # return JsonResponse(news_serialized, encoder=JSONEncoder, safe=False)
+    return HttpResponse(news_serialized)
+
+
+@csrf_exempt
+@require_POST
+def query_incomes(request):
+    thisToken = request.POST['token']
+    incomesNumber = request.POST.get('count', 11)
+    thisUser = User.objects.filter(token__token=thisToken).get()
+
+    incomes = Income.objects.filter(user=thisUser).order_by('-date')[:incomesNumber]
+    incomes_serialized = serializers.serialize("json", incomes)
+
+    return HttpResponse(incomes_serialized)
+
+
+@csrf_exempt
+@require_POST
+def query_expenses(request):
+    thisToken = request.POST['token']
+    expensesNumber = request.POST.get('count', 11)
+
+    thisUser = User.objects.filter(token__token=thisToken).get()
+
+    expenses = Expense.objects.filter(user=thisUser).order_by('-date')[:expensesNumber]
+    expenses_serialized = serializers.serialize("json", expenses)
+
+    return JsonResponse(expenses_serialized, encoder=JSONEncoder)
 
 
 @csrf_exempt
