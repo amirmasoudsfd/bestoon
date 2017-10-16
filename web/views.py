@@ -25,6 +25,10 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.hashers import make_password, check_password
 from .models import User, Token, Expense, Income, Passwordresetcodes
 
+from django.views.decorators.http import require_POST
+
+from .utils import grecaptcha_verify, RateLimited,get_client_ip
+
 # create random string for Toekn
 random_str = lambda N: ''.join(
     random.SystemRandom().choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(N))
@@ -35,30 +39,10 @@ def index(request):
     return render(request, 'index.html', context)
 
 
-def get_client_ip(request):
-    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-    if x_forwarded_for:
-        ip = x_forwarded_for.split(',')[0]
-    else:
-        ip = request.META.get('REMOTE_ADDR')
-    return ip
-
-
-def grecaptcha_verify(request):
-    data = request.POST
-    captcha_rs = data.get('g-recaptcha-response')
-    url = "https://www.google.com/recaptcha/api/siteverify"
-    params = {
-        'secret': settings.RECAPTCHA_SECRET_KEY,
-        'response': captcha_rs,
-        'remoteip': get_client_ip(request)
-    }
-    verify_rs = requests.get(url, params=params, verify=True)
-    verify_rs = verify_rs.json()
-    return verify_rs.get("success", False)
 
 
 @csrf_exempt
+@require_POST
 def generalstat(request):
     # TODO: get a duration (from - to), default 1 month
 
@@ -74,6 +58,8 @@ def generalstat(request):
 
 
 @csrf_exempt
+@require_POST
+# @RateLimited(2)
 def login(request):
     if request.POST.has_key('username') and request.POST.has_key('password'):
         username, password = request.POST['username'], request.POST['password']
@@ -82,7 +68,6 @@ def login(request):
         except ObjectDoesNotExist:
             context = {'result': 'error'}
             return JsonResponse(context, encoder=JSONEncoder)
-
 
         if check_password(password, thisUser.password):
             thisToken = Token.objects.get(user=thisUser)
@@ -168,6 +153,7 @@ def register(request):
 
 
 @csrf_exempt
+@require_POST
 def submit_income(request):
     """" exspense add """
     # TODO: might be fake
@@ -189,6 +175,7 @@ def submit_income(request):
 
 
 @csrf_exempt
+@require_POST
 def submit_expense(request):
     """" exspense add """
     # TODO: might be fake
